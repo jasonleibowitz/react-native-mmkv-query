@@ -1,3 +1,4 @@
+import { supabase } from "../supabase";
 import { IExercise } from "../types";
 
 const exercises: IExercise[] = [
@@ -28,31 +29,25 @@ const exercises: IExercise[] = [
   },
 ];
 
-export const fakeApi = {
-  getExercises: () =>
-    new Promise<IExercise[]>((resolve) => {
-      setTimeout(() => resolve(exercises), 300);
-    }),
-  updateExerciseStatus: (id: string, isDone: boolean) =>
-    new Promise<IExercise>((resolve) => {
-      setTimeout(() => {
-        const exerciseToUpdate = exercises.find((t) => t.id === id);
+export const api = {
+  getExercises: async () => {
+    const { data, error } = await supabase
+      .from("exercises")
+      .select(`id, title, isDone, isNotSynced, user_id`)
+      .eq("user_id", 1);
+    return data;
+  },
+  updateExerciseStatus: async (id: string, isDone: boolean) => {
+    const { error, status } = await supabase
+      .from("exercises")
+      .update({ isDone })
+      .eq("id", id);
 
-        if (exerciseToUpdate) {
-          const updatedExercise = {
-            ...exerciseToUpdate,
-            isDone,
-          };
+    // TODO: Handle error
+    if (error) {
+      throw error;
+    }
 
-          const updatedExercises = exercises.map((exercise) => {
-            if (exercise.id === id) {
-              return updatedExercise;
-            }
-            return exercise;
-          });
-
-          resolve(updatedExercise);
-        }
-      }, 300);
-    }),
+    return status;
+  },
 };

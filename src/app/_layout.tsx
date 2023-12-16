@@ -6,24 +6,11 @@ import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { MMKV } from "react-native-mmkv";
 
 import { OfflineBanner } from "@/components/offlineBanner";
 import { queryClient } from "@/lib/data/queries";
+import { clientStorage } from "@/lib/mmkv";
 
-const storage = new MMKV();
-const clientStorage = {
-  setItem: (key: string, value: any) => {
-    storage.set(key, value);
-  },
-  getItem: (key: string) => {
-    const value = storage.getString(key);
-    return value === undefined ? null : value;
-  },
-  removeItem: (key: string) => {
-    storage.delete(key);
-  },
-};
 const persister = createSyncStoragePersister({
   storage: clientStorage,
   throttleTime: 3000,

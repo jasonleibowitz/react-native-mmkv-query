@@ -1,6 +1,6 @@
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 
-import { fakeApi } from "./api";
+import { api } from "./api";
 import { IExercise, UpdateExercisePayload } from "../types";
 
 export const queryClient = new QueryClient();
@@ -8,7 +8,7 @@ export const queryClient = new QueryClient();
 export const useExercises = () =>
   useQuery({
     queryKey: ["exercises"],
-    queryFn: () => fakeApi.getExercises(),
+    queryFn: () => api.getExercises(),
     /* Ensures that once the data is fetched and archived,
      * it remains available for the lifetime of the app */
     staleTime: Infinity,
@@ -37,13 +37,27 @@ export const useUpdateExerciseStatus = () =>
   useMutation({
     mutationKey: ["exercises"],
     mutationFn: async (payload: UpdateExercisePayload) =>
-      fakeApi.updateExerciseStatus(payload.id, payload.isDone),
+      await api.updateExerciseStatus(payload.id, payload.isDone),
     onMutate: async (payload: UpdateExercisePayload) => {
-      // @ts-expect-error
-      await queryClient.cancelQueries(["exercises"]);
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      queryClient.cancelQueries({ queryKey: ["exercises"] });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(["exercises"]);
+
+      // Optimistically update to the new value
       updateLocalExerciseList(payload.id, payload.isDone, true);
+
+      // Return a context object with the snapshotted value
+      return { previousData };
     },
-    onSuccess(data) {
-      updateLocalExerciseList(data.id, data.isDone, false);
+    // If the mutation fails, use the context returned from onMutate to roll back
+    onError(error, _, context) {
+      queryClient.setQueryData(["exercises"], context?.previousData);
+      console.error(error);
+    },
+    onSuccess(statusCode, variables) {
+      updateLocalExerciseList(variables.id, variables.isDone, false);
+      queryClient.invalidateQueries({ queryKey: ["exercises"] });
     },
   });

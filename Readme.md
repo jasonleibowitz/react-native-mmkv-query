@@ -9,6 +9,9 @@
 5. Development Build
 6. Install React Native Gesture Handler
 7. Install support for Icons via @expo/vector-icons
+8. Configure [Env Variable](https://docs.expo.dev/guides/environment-variables/)
+9. Add Supabase Client. Don't forget to [set policies](https://supabase.com/docs/guides/auth/row-level-security) for the DB
+10. Add Clerk Auth
 
 ## Still to Explore
 

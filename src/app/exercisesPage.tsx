@@ -8,6 +8,14 @@ const ExercisesPage = () => {
   const { isLoading, data: exercises } = useExercises();
   const updateExercise = useUpdateExerciseStatus();
 
+  // console.log(
+  //   `/// in ExercisesPage. Loading: ${isLoading}. data: ${JSON.stringify(
+  //     exercises,
+  //     null,
+  //     2,
+  //   )}`,
+  // );
+
   const handleMarkExerciseAsDone = (exercise: IExercise) => {
     updateExercise.mutate({ id: exercise.id, isDone: !exercise.isDone });
   };
