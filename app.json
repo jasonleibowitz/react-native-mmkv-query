@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "mmkv-native",
+    "scheme": "mmkvnative",
     "slug": "mmkv-native",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,16 +16,32 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jasonleibowitz.mmkvnative"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.jasonleibowitz.mmkvnative"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "21bb9bf9-27df-420a-9718-3ead72e40501"
+      }
     }
   }
 }
