@@ -3,25 +3,44 @@ import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { api } from "./api";
 import { IExercise, UpdateExercisePayload } from "../types";
 
+import { useAuth } from "@/hooks/useAuth";
+
 export const queryClient = new QueryClient();
 
-export const useExercises = () =>
-  useQuery({
+export const useExercises = () => {
+  const { user } = useAuth();
+  return useQuery<IExercise[]>({
     queryKey: ["exercises"],
-    queryFn: () => api.getExercises(),
+    queryFn: () => api.getExercises(user?.id as string),
     /* Ensures that once the data is fetched and archived,
      * it remains available for the lifetime of the app */
     staleTime: Infinity,
+    enabled: !!user?.id,
   });
+};
 
 const updateLocalExerciseList = (
   id: string,
   isDone: boolean,
   isNotSynced?: boolean,
 ) => {
+  // console.log(
+  //   `/// in updateLocalExerciseList. isDone: ${isDone}. isNotSynced; ${isNotSynced}`,
+  // );
   queryClient.setQueryData<IExercise[]>(["exercises"], (exercisesList) => {
     return exercisesList?.map((exercise) => {
       if (exercise.id === id) {
+        // console.log(
+        //   `/// in updateLocalExerciseList. newObj: ${JSON.stringify(
+        //     {
+        //       ...exercise,
+        //       isDone,
+        //       isNotSynced,
+        //     },
+        //     null,
+        //     2,
+        //   )}`,
+        // );
         return {
           ...exercise,
           isDone,
@@ -58,6 +77,6 @@ export const useUpdateExerciseStatus = () =>
     },
     onSuccess(statusCode, variables) {
       updateLocalExerciseList(variables.id, variables.isDone, false);
-      queryClient.invalidateQueries({ queryKey: ["exercises"] });
+      // queryClient.invalidateQueries({ queryKey: ["exercises"] });
     },
   });

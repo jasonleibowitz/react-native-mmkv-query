@@ -5,8 +5,8 @@ import { useExercises, useUpdateExerciseStatus } from "@/lib/data/queries";
 import { IExercise } from "@/lib/types";
 
 const ExercisesPage = () => {
-  const { isLoading, data: exercises } = useExercises();
   const updateExercise = useUpdateExerciseStatus();
+  const { isLoading, data: exercises } = useExercises();
 
   const handleMarkExerciseAsDone = (exercise: IExercise) => {
     updateExercise.mutate({ id: exercise.id, isDone: !exercise.isDone });

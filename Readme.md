@@ -11,7 +11,6 @@
 7. Install support for Icons via @expo/vector-icons
 8. Configure [Env Variable](https://docs.expo.dev/guides/environment-variables/)
 9. Add Supabase Client. Don't forget to [set policies](https://supabase.com/docs/guides/auth/row-level-security) for the DB
-10. Add Clerk Auth
 
 ## Still to Explore
 
@@ -26,3 +25,6 @@
 
 1. [Tamagui](https://tamagui.dev/) - full UI library for React Native. Styling is similar to Tailwind, but you add styles as props directly to the component.
 2. [NativeWind](https://www.nativewind.dev/) - Much simpler Tailwind-type styling option for React Native. Pass styles via the `className` prop on your components after putting them through the HOC `styles` method.
+3. Expo Router
+4. Expo Constants
+5. React Native Gesture Handler
