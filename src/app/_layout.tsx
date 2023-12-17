@@ -1,29 +1,24 @@
 import NetInfo from "@react-native-community/netinfo";
+import { Session } from "@supabase/supabase-js";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { onlineManager } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+// import Constants from "expo-constants";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { View, Text, SafeAreaView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { MMKV } from "react-native-mmkv";
 
+import { Account } from "@/components/account";
+import { Auth } from "@/components/auth";
 import { OfflineBanner } from "@/components/offlineBanner";
+import { useAuth } from "@/hooks/useAuth";
 import { queryClient } from "@/lib/data/queries";
+import { clientStorage } from "@/lib/mmkv";
+import { supabase } from "@/lib/supabase";
+import { AuthProvider } from "@/providers/AuthProvider";
 
-const storage = new MMKV();
-const clientStorage = {
-  setItem: (key: string, value: any) => {
-    storage.set(key, value);
-  },
-  getItem: (key: string) => {
-    const value = storage.getString(key);
-    return value === undefined ? null : value;
-  },
-  removeItem: (key: string) => {
-    storage.delete(key);
-  },
-};
 const persister = createSyncStoragePersister({
   storage: clientStorage,
   throttleTime: 3000,
@@ -31,6 +26,7 @@ const persister = createSyncStoragePersister({
 
 export default function Layout() {
   const [isOnline, setIsOnline] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     return NetInfo.addEventListener((state) => {
@@ -40,21 +36,46 @@ export default function Layout() {
     });
   });
 
-  return (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{ persister }}
-      onSuccess={() =>
-        queryClient
-          .resumePausedMutations()
-          .then(() => queryClient.invalidateQueries())
-      }
-    >
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        {!isOnline && <OfflineBanner />}
-        <StatusBar />
-        <Tabs />
-      </GestureHandlerRootView>
-    </PersistQueryClientProvider>
-  );
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+  }, []);
+  if (session && session.user) {
+    return (
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister }}
+        onSuccess={() =>
+          queryClient
+            .resumePausedMutations()
+            .then(() => queryClient.invalidateQueries())
+        }
+      >
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <AuthProvider>
+            <SafeAreaView>
+              {/* {!isOnline && <OfflineBanner />} */}
+              <Account key={session.user.id} />
+              <StatusBar />
+            </SafeAreaView>
+            <Tabs />
+          </AuthProvider>
+        </GestureHandlerRootView>
+      </PersistQueryClientProvider>
+    );
+  } else {
+    return (
+      <AuthProvider>
+        <SafeAreaView>
+          <Text style={{ color: "black" }}>Not signed in</Text>
+          <Auth />
+        </SafeAreaView>
+      </AuthProvider>
+    );
+  }
 }

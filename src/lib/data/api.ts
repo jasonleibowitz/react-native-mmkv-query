@@ -1,58 +1,50 @@
-import { IExercise } from "../types";
+import { supabase } from "../supabase";
+import { toCamelCase } from "../utils";
 
-const exercises: IExercise[] = [
-  {
-    id: "1",
-    title: "Push ups",
-    isDone: true,
+export const api = {
+  /** Gets the User Profile object associated with the Auth User Id */
+  getUserProfile: async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+    return data;
   },
-  {
-    id: "2",
-    title: "Pull ups",
-    isDone: false,
+  /** Gets all exercises belonging to the provided Auth User Id */
+  getExercises: async (userId: string) => {
+    const { data, error } = await supabase
+      .from("exercise")
+      .select("*")
+      .eq("user_id", userId);
+    return toCamelCase(data);
   },
-  {
-    id: "3",
-    title: "Squats",
-    isDone: false,
-  },
-  {
-    id: "4",
-    title: "Lunges",
-    isDone: false,
-  },
-  {
-    id: "5",
-    title: "Bench press",
-    isDone: false,
-  },
-];
+  /** Updates a specific exercise's isDone property by id. Has RLS to only
+   * allow users to update their own exercises */
+  updateExerciseStatus: async (id: string, isDone: boolean) => {
+    console.log(`/// about to updateExercise. id: ${id}. isDone: ${isDone}`);
+    const { error, status } = await supabase
+      .from("exercise")
+      .update({ is_done: isDone })
+      .eq("id", id);
 
-export const fakeApi = {
-  getExercises: () =>
-    new Promise<IExercise[]>((resolve) => {
-      setTimeout(() => resolve(exercises), 300);
-    }),
-  updateExerciseStatus: (id: string, isDone: boolean) =>
-    new Promise<IExercise>((resolve) => {
-      setTimeout(() => {
-        const exerciseToUpdate = exercises.find((t) => t.id === id);
+    console.log(`/// updated exercise. status: ${status}`);
 
-        if (exerciseToUpdate) {
-          const updatedExercise = {
-            ...exerciseToUpdate,
-            isDone,
-          };
+    // TODO: Handle error
+    if (error) {
+      throw error;
+    }
 
-          const updatedExercises = exercises.map((exercise) => {
-            if (exercise.id === id) {
-              return updatedExercise;
-            }
-            return exercise;
-          });
+    return status;
+  },
+  /** Updates the username of the provided userId, returning the updated UserProfile object */
+  updateUsername: async (id: string, username: string) => {
+    const { data, error } = await supabase
+      .from("profile")
+      .update({ username })
+      .eq("user_id", id)
+      .select();
 
-          resolve(updatedExercise);
-        }
-      }, 300);
-    }),
+    return toCamelCase(data);
+  },
 };

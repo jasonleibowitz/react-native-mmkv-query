@@ -9,6 +9,7 @@ type ExerciseProps = {
   onButtonPress: () => void;
 };
 export const Exercise = ({ exercise, onButtonPress }: ExerciseProps) => {
+  console.log(`/// exercise: ${JSON.stringify(exercise, null, 2)}`);
   return (
     <View style={styles.container}>
       <TouchableOpacity
