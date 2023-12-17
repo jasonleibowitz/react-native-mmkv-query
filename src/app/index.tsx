@@ -1,4 +1,4 @@
-import { SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, Text } from "react-native";
 
 import { LinkButton } from "@/components/ui/linkButton";
 

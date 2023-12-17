@@ -11,6 +11,11 @@
 7. Install support for Icons via @expo/vector-icons
 8. Configure [Env Variable](https://docs.expo.dev/guides/environment-variables/)
 9. Add Supabase Client. Don't forget to [set policies](https://supabase.com/docs/guides/auth/row-level-security) for the DB
+10. Add Supabase Auth
+
+- https://dev.to/sruhleder/creating-user-profiles-on-sign-up-in-supabase-5037
+  - https://github.com/supabase/supabase/tree/master/examples/user-management/expo-user-management
+  - https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native
 
 ## Still to Explore
 

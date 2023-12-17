@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Account } from "@/components/account";
 import { Auth } from "@/components/auth";
 import { OfflineBanner } from "@/components/offlineBanner";
+import { useAuth } from "@/hooks/useAuth";
 import { queryClient } from "@/lib/data/queries";
 import { clientStorage } from "@/lib/mmkv";
 import { supabase } from "@/lib/supabase";
@@ -44,7 +45,6 @@ export default function Layout() {
       setSession(session);
     });
   }, []);
-
   if (session && session.user) {
     return (
       <PersistQueryClientProvider
@@ -59,8 +59,8 @@ export default function Layout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
           <AuthProvider>
             <SafeAreaView>
-              {!isOnline && <OfflineBanner />}
-              <Account key={session.user.id} session={session} />
+              {/* {!isOnline && <OfflineBanner />} */}
+              <Account key={session.user.id} />
               <StatusBar />
             </SafeAreaView>
             <Tabs />

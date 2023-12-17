@@ -1,21 +1,25 @@
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 
 import { api } from "./api";
-import { IExercise, UpdateExercisePayload } from "../types";
+import {
+  IExercise,
+  UpdateExercisePayload,
+  UpdateUsernamePayload,
+} from "../types";
 
 import { useAuth } from "@/hooks/useAuth";
 
 export const queryClient = new QueryClient();
 
 export const useExercises = () => {
-  const { user } = useAuth();
+  const { session } = useAuth();
   return useQuery<IExercise[]>({
     queryKey: ["exercises"],
-    queryFn: () => api.getExercises(user?.id as string),
+    queryFn: () => api.getExercises(session?.user?.id as string),
     /* Ensures that once the data is fetched and archived,
      * it remains available for the lifetime of the app */
     staleTime: Infinity,
-    enabled: !!user?.id,
+    enabled: !!session?.user?.id,
   });
 };
 
@@ -24,23 +28,9 @@ const updateLocalExerciseList = (
   isDone: boolean,
   isNotSynced?: boolean,
 ) => {
-  // console.log(
-  //   `/// in updateLocalExerciseList. isDone: ${isDone}. isNotSynced; ${isNotSynced}`,
-  // );
   queryClient.setQueryData<IExercise[]>(["exercises"], (exercisesList) => {
     return exercisesList?.map((exercise) => {
       if (exercise.id === id) {
-        // console.log(
-        //   `/// in updateLocalExerciseList. newObj: ${JSON.stringify(
-        //     {
-        //       ...exercise,
-        //       isDone,
-        //       isNotSynced,
-        //     },
-        //     null,
-        //     2,
-        //   )}`,
-        // );
         return {
           ...exercise,
           isDone,
@@ -80,3 +70,19 @@ export const useUpdateExerciseStatus = () =>
       // queryClient.invalidateQueries({ queryKey: ["exercises"] });
     },
   });
+
+export const useUserProfile = (userId?: string) => {
+  return useQuery({
+    queryKey: ["userProfile", userId],
+    queryFn: () => api.getUserProfile(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useUpdateUsername = () => {
+  return useMutation({
+    mutationKey: ["updateUsername"],
+    mutationFn: async (payload: UpdateUsernamePayload) =>
+      await api.updateUsername(payload.id, payload.username),
+  });
+};

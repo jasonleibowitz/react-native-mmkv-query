@@ -1,79 +1,30 @@
-import type { Session } from "@supabase/supabase-js";
-import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Alert, Button, TextInput } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Text, Button, TextInput } from "react-native";
 
+import { useAuth } from "@/hooks/useAuth";
+import { useUpdateUsername, useUserProfile } from "@/lib/data/queries";
 import { supabase } from "@/lib/supabase";
 
-export const Account = ({ session }: { session: Session }) => {
-  const [loading, setLoading] = useState(true);
+export const Account = () => {
   const [username, setUsername] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const { session } = useAuth();
+  const { data: userProfile } = useUserProfile(session?.user?.id);
 
   useEffect(() => {
-    if (session) getProfile();
-  }, [session]);
-
-  const getProfile = async () => {
-    try {
-      setLoading(true);
-      if (!session?.user) throw new Error("No user on the session");
-
-      const { data, error, status } = await supabase
-        .from("profile")
-        .select(`*`)
-        .eq("id", session?.user.id)
-        .single();
-
-      console.log(
-        `/// in getProfile. sessionUserId: ${session?.user
-          .id}. data: ${JSON.stringify(data, null, 2)}`,
-      );
-
-      if (error && status !== 406) {
-        throw error;
-      }
-
-      if (data) {
-        setUsername(data.username);
-        setAvatarUrl(data.avatar_url);
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        Alert.alert(err.message);
-      }
-    } finally {
-      setLoading(false);
+    if (!username && !!userProfile?.username) {
+      setUsername(userProfile.username);
     }
-  };
+  }, [userProfile?.username]);
 
-  const updateProfile = async ({
-    username,
-    avatar_url,
-  }: {
-    username: string;
-    avatar_url: string;
-  }) => {
-    try {
-      if (!session?.user) throw new Error("No user on the session!");
+  const updateProfile = useUpdateUsername();
 
-      const updates = {
-        id: session?.user.id,
-        username,
-        avatar_url,
-        updated_at: new Date(),
-      };
-
-      const { error } = await supabase.from("users").upsert(updates);
-
-      if (error) throw error;
-    } catch (err) {
-      if (err instanceof Error) {
-        Alert.alert(err.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!session || !session?.user) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -96,7 +47,9 @@ export const Account = ({ session }: { session: Session }) => {
       <View style={styles.verticallySpaced}>
         <Button
           title="Update Info"
-          onPress={() => updateProfile({ username, avatar_url: "" })}
+          onPress={() =>
+            updateProfile.mutate({ id: session?.user?.id, username })
+          }
         />
       </View>
 
