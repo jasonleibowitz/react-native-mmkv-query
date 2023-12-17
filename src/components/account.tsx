@@ -19,15 +19,15 @@ export const Account = ({ session }: { session: Session }) => {
       if (!session?.user) throw new Error("No user on the session");
 
       const { data, error, status } = await supabase
-        .from("user")
-        .select(`id, username, email, avatar_url`)
-        // .eq("id", `${session?.user.id}`)
+        .from("profile")
+        .select(`*`)
+        .eq("id", session?.user.id)
         .single();
 
-      // console.log(
-      //   `/// in getProfile. sessionUserId: ${session?.user
-      //     .id}. data: ${JSON.stringify(data, null, 2)}`,
-      // );
+      console.log(
+        `/// in getProfile. sessionUserId: ${session?.user
+          .id}. data: ${JSON.stringify(data, null, 2)}`,
+      );
 
       if (error && status !== 406) {
         throw error;
@@ -91,6 +91,12 @@ export const Account = ({ session }: { session: Session }) => {
           placeholder="username"
           value={username || ""}
           onChangeText={(username) => setUsername(username)}
+        />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Button
+          title="Update Info"
+          onPress={() => updateProfile({ username, avatar_url: "" })}
         />
       </View>
 

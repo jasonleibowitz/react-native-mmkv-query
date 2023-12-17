@@ -27,21 +27,22 @@ export const Auth = () => {
     setLoading(false);
   };
 
-  // const signUpWithEmail = async () => {
-  //   setLoading(true);
+  const signUpWithEmail = async () => {
+    setLoading(true);
 
-  //   const {
-  //     data: { session },
-  //     error,
-  //   } = await supabase.auth.signUp({
-  //     email,
-  //     password,
-  //   });
+    const {
+      data: { session, user },
+      error,
+    } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-  //   if (error) Alert.alert(error.message);
-  //   if (!session) Alert.alert("Please check your inbox for email verification");
-  //   setLoading(false);
-  // };
+    if (error) Alert.alert(error.message);
+    if (!session) Alert.alert("Please check your inbox for email verification");
+    signIn({ session, user });
+    setLoading(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -72,13 +73,13 @@ export const Auth = () => {
         />
       </View>
 
-      {/* <View style={styles.verticallySpaced}>
+      <View style={styles.verticallySpaced}>
         <Button
           title="Sign up"
           onPress={() => signUpWithEmail()}
           disabled={loading}
         />
-      </View> */}
+      </View>
     </View>
   );
 };
