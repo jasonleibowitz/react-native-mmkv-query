@@ -6,7 +6,9 @@ export default function Page() {
   return (
     <SafeAreaView>
       <Text>Home Screen</Text>
-      <LinkButton title="About" href="/about" />
+      <LinkButton href="/about" theme="active">
+        About
+      </LinkButton>
     </SafeAreaView>
   );
 }

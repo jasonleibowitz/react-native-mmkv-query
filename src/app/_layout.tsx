@@ -5,15 +5,18 @@ import { onlineManager } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 // import Constants from "expo-constants";
 import { Tabs } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { View, Text, SafeAreaView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { TamaguiProvider } from "tamagui";
+
+import config from "../../tamagui.config";
 
 import { Account } from "@/components/account";
 import { Auth } from "@/components/auth";
 import { OfflineBanner } from "@/components/offlineBanner";
-import { useAuth } from "@/hooks/useAuth";
 import { queryClient } from "@/lib/data/queries";
 import { clientStorage } from "@/lib/mmkv";
 import { supabase } from "@/lib/supabase";
@@ -45,6 +48,7 @@ export default function Layout() {
       setSession(session);
     });
   }, []);
+
   if (session && session.user) {
     return (
       <PersistQueryClientProvider
@@ -56,16 +60,18 @@ export default function Layout() {
             .then(() => queryClient.invalidateQueries())
         }
       >
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <AuthProvider>
-            <SafeAreaView>
-              {/* {!isOnline && <OfflineBanner />} */}
-              <Account key={session.user.id} />
-              <StatusBar />
-            </SafeAreaView>
-            <Tabs />
-          </AuthProvider>
-        </GestureHandlerRootView>
+        <TamaguiProvider config={config}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <AuthProvider>
+              <SafeAreaView>
+                {/* {!isOnline && <OfflineBanner />} */}
+                <Account key={session.user.id} />
+                <StatusBar />
+              </SafeAreaView>
+              <Tabs />
+            </AuthProvider>
+          </GestureHandlerRootView>
+        </TamaguiProvider>
       </PersistQueryClientProvider>
     );
   } else {

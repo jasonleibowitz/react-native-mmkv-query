@@ -6,7 +6,9 @@ export default function Page() {
   return (
     <View>
       <Text>About Screen</Text>
-      <LinkButton title="Go Home" href="/" />
+      <LinkButton href="/" theme="active">
+        Go Home
+      </LinkButton>
     </View>
   );
 }

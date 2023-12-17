@@ -1,7 +1,16 @@
-import { router } from "expo-router";
-import { Button as RNButton } from "react-native";
+import { Link } from "expo-router";
+import { Button } from "tamagui";
 
-type LinkButtonProps = { title: string; href: string };
-export const LinkButton = ({ title, href }: LinkButtonProps) => {
-  return <RNButton title={title} onPress={() => router.push(href)} />;
+type LinkButtonProps = {
+  children: JSX.Element | string;
+  href: string;
+};
+export const LinkButton = ({ children, href, ...rest }: LinkButtonProps) => {
+  return (
+    <Link href={href} asChild>
+      <Button width="50%" alignSelf="center" marginVertical={10} {...rest}>
+        {children}
+      </Button>
+    </Link>
+  );
 };

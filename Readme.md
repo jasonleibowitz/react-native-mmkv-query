@@ -23,6 +23,13 @@
 - [ ] [Preload Fonts](https://docs.expo.dev/archive/classic-updates/preloading-and-caching-assets/#pre-loading-and-caching-assets), specifically vector-icons
 - [ ] Authentication via [Expo Auth](https://docs.expo.dev/guides/authentication/) or [Clerk](https://clerk.com/solutions/react-native-expo)
 - [ ] Publish this repo as an [Expo Template](https://www.reactnativeschool.com/how-to-create-an-expo-template-for-react-native-development)
+- [ ] [Custom fonts](https://docs.expo.dev/versions/latest/sdk/font/)?
+
+## Pre-Launch Checklist
+
+- [ ] App Icon
+- [ ] Splash Screen
+- [ ] Tamagui [Optimizing Compiler](https://tamagui.dev/docs/intro/compiler-install) - highly recommended before shipping to Prod
 
 ## Library to Decide Between
 
